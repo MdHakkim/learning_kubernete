@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: learning-kafka
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/MdHakkim/learning_kubernete.git
+    targetRevision: master
+    path: helm/helm_code
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: learning-kafka
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
