@@ -1,0 +1,6 @@
+apiVersion: v2
+name: helm-learning
+description: Helm chart for Kafka microservices learning project
+type: application
+version: 0.1.0
+appVersion: "1.0"
