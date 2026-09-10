@@ -1,6 +1,6 @@
 replicaCount: 1
 
 image:
-  repository: ""
+  repository: "YOUR_ACTUAL_DOCKERHUB_USERNAME/learning-kafka-invoicing"
   tag: latest
   pullPolicy: IfNotPresent
