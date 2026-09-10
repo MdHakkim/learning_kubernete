@@ -2,5 +2,5 @@ replicaCount: 1
 
 image:
   repository: "mohamedhakkim/learning-kafka-invoicing"
-  tag: latest
+  tag: 55c3ab55bfd481fbfbbbddeff130d5e38eb5f7f8
   pullPolicy: IfNotPresent
