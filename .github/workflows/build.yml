@@ -83,16 +83,27 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_INVOICING_REPOSITORY }}:$IMAGE_TAG
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_INVOICING_REPOSITORY }}:latest
       # 8. UPDATE HELM VALUES  ← ADD HERE
-      - name: Update Helm image tag
+      - name: Update Helm image tags
         working-directory: ./helm/helm_code
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" values.yaml
-
+          echo "Updating Helm image tags to ${IMAGE_TAG}"
+      
+          yq -i '.order.image.tag = strenv(IMAGE_TAG)' values.yaml
+          yq -i '.shipping.image.tag = strenv(IMAGE_TAG)' values.yaml
+          yq -i '.invoicing.image.tag = strenv(IMAGE_TAG)' values.yaml
+      
+          echo "Updated values.yaml:"
+          cat values.yaml
+      
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
+      
           git add values.yaml
-          git commit -m "Update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
+      
+          git diff --cached
+      
+          git commit -m "Update image tags to ${IMAGE_TAG}" || echo "No changes to commit"
+      
           git push
