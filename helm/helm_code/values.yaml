@@ -1,6 +1,19 @@
 replicaCount: 1
 
-image:
-  repository: "mohamedhakkim/learning-kafka-invoicing"
-  tag: 55c3ab55bfd481fbfbbbddeff130d5e38eb5f7f8
-  pullPolicy: IfNotPresent
+order:
+  image:
+    repository: mohamedhakkim/learning-kafka-order
+    tag: latest
+    pullPolicy: IfNotPresent
+
+shipping:
+  image:
+    repository: mohamedhakkim/learning-kafka-shipping
+    tag: latest
+    pullPolicy: IfNotPresent
+
+invoicing:
+  image:
+    repository: mohamedhakkim/learning-kafka-invoicing
+    tag: latest
+    pullPolicy: IfNotPresent
