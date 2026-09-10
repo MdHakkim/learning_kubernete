@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: shipping
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.shipping.image.repository }}:{{ .Values.shipping.image.tag }}"
+          imagePullPolicy: {{ .Values.shipping.image.pullPolicy }}
           ports:
             - containerPort: 8080
