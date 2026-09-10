@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: invoicing
-          image: "{{ .Values.order.image.repository }}:{{ .Values.order.image.tag }}"
-          imagePullPolicy: {{ .Values.order.image.pullPolicy }}
+          image: "{{ .Values.invoicing.image.repository }}:{{ .Values.invoicing.image.tag }}"
+          imagePullPolicy: {{ .Values.invoicing.image.pullPolicy }}
           ports:
             - containerPort: 8080
