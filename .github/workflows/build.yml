@@ -16,7 +16,37 @@ env:
   DOCKERHUB_INVOICING_REPOSITORY: learning-kafka-invoicing
 
 jobs:
+  # --------------------------------------------------
+  # NEW JOB: figure out which service folders actually
+  # changed in this push/PR, so we don't rebuild
+  # services that nobody touched.
+  # --------------------------------------------------
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      order: ${{ steps.filter.outputs.order }}
+      shipping: ${{ steps.filter.outputs.shipping }}
+      invoicing: ${{ steps.filter.outputs.invoicing }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect which service folders changed
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            order:
+              - 'microservice-kafka/microservice-kafka-order/**'
+            shipping:
+              - 'microservice-kafka/microservice-kafka-shipping/**'
+            invoicing:
+              - 'microservice-kafka/microservice-kafka-invoicing/**'
+
   build:
+    needs: changes
+    # Skip the whole build job if NONE of the 3 services changed
+    if: needs.changes.outputs.order == 'true' || needs.changes.outputs.shipping == 'true' || needs.changes.outputs.invoicing == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -56,9 +86,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # --------------------------------------------------
-      # Build and Push ORDER
+      # Build and Push ORDER — only if order/ changed
       # --------------------------------------------------
       - name: Build and push Order image
+        if: needs.changes.outputs.order == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -74,9 +105,10 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_ORDER_REPOSITORY }}:latest
 
       # --------------------------------------------------
-      # Build and Push SHIPPING
+      # Build and Push SHIPPING — only if shipping/ changed
       # --------------------------------------------------
       - name: Build and push Shipping image
+        if: needs.changes.outputs.shipping == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -92,9 +124,10 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_SHIPPING_REPOSITORY }}:latest
 
       # --------------------------------------------------
-      # Build and Push INVOICING
+      # Build and Push INVOICING — only if invoicing/ changed
       # --------------------------------------------------
       - name: Build and push Invoicing image
+        if: needs.changes.outputs.invoicing == 'true'
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -110,8 +143,8 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_INVOICING_REPOSITORY }}:latest
 
       # --------------------------------------------------
-      # Update Helm values
-      # All 3 services use the SAME Git SHA
+      # Update Helm values — only touch the lines for
+      # services that actually changed and were rebuilt
       # --------------------------------------------------
       - name: Update Helm image tags
         if: github.event_name == 'push'
@@ -119,11 +152,22 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "Updating Helm image tags to ${IMAGE_TAG}"
+          echo "Updating Helm image tags to ${IMAGE_TAG} (only for changed services)"
 
-          yq -i '.order.image.tag = strenv(IMAGE_TAG)' values.yaml
-          yq -i '.shipping.image.tag = strenv(IMAGE_TAG)' values.yaml
-          yq -i '.invoicing.image.tag = strenv(IMAGE_TAG)' values.yaml
+          if [ "${{ needs.changes.outputs.order }}" == "true" ]; then
+            yq -i '.order.image.tag = strenv(IMAGE_TAG)' values.yaml
+            echo "Updated order tag"
+          fi
+
+          if [ "${{ needs.changes.outputs.shipping }}" == "true" ]; then
+            yq -i '.shipping.image.tag = strenv(IMAGE_TAG)' values.yaml
+            echo "Updated shipping tag"
+          fi
+
+          if [ "${{ needs.changes.outputs.invoicing }}" == "true" ]; then
+            yq -i '.invoicing.image.tag = strenv(IMAGE_TAG)' values.yaml
+            echo "Updated invoicing tag"
+          fi
 
           echo "Updated values.yaml:"
           cat values.yaml
