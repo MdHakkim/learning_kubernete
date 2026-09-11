@@ -2,15 +2,15 @@ replicaCount: 1
 order:
   image:
     repository: mohamedhakkim/learning-kafka-order
-    tag: 6071920cb95a52d2208e370b3d23c2638dbde2a2
+    tag: 667124e329f9975d05ab53c8637c64df19bad70b
     pullPolicy: IfNotPresent
 shipping:
   image:
     repository: mohamedhakkim/learning-kafka-shipping
-    tag: 6071920cb95a52d2208e370b3d23c2638dbde2a2
+    tag: 667124e329f9975d05ab53c8637c64df19bad70b
     pullPolicy: IfNotPresent
 invoicing:
   image:
     repository: mohamedhakkim/learning-kafka-invoicing
-    tag: 6071920cb95a52d2208e370b3d23c2638dbde2a2
+    tag: 667124e329f9975d05ab53c8637c64df19bad70b
     pullPolicy: IfNotPresent
