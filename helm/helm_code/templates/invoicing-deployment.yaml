@@ -34,3 +34,5 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: MANAGEMENT_METRICS_ENABLE_PROCESSOR
+              value: "false"
