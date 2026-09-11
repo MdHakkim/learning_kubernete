@@ -83,6 +83,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_INVOICING_REPOSITORY }}:$IMAGE_TAG
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_INVOICING_REPOSITORY }}:latest
       # 8. UPDATE HELM VALUES  ← ADD HERE
+      # 8. UPDATE HELM VALUES
       - name: Update Helm image tags
         working-directory: ./helm/helm_code
         env:
@@ -106,4 +107,9 @@ jobs:
       
           git commit -m "Update image tags to ${IMAGE_TAG}" || echo "No changes to commit"
       
-          git push
+          # Get latest changes from GitHub before pushing
+          git fetch origin master
+          git rebase origin/master
+      
+          # Push the rebased commit
+          git push origin master
